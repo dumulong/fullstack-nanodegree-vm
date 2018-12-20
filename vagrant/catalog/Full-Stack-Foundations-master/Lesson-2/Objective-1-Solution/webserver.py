@@ -2,12 +2,12 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import cgi
 
 # import CRUD Operations from Lesson 1
-from database_setup import Base, Category, CategoryItem
+from database_setup import Base, Restaurant, MenuItem
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Create session and connect to DB
-engine = create_engine('sqlite:///catalog.db')
+engine = create_engine('sqlite:///restaurantmenu.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
@@ -17,20 +17,15 @@ class webServerHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         try:
-            if self.path.endswith("/catalog"):
-                categories = session.query(Category).all()
+            if self.path.endswith("/restaurants"):
+                restaurants = session.query(Restaurant).all()
                 output = ""
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
                 output += "<html><body>"
-                for category in categories:
-                    output += category.name
-                    output += "</br>"
-                    # Objective 2 -- Add Edit and Delete Links
-                    output += "<a href ='#' >Edit </a> "
-                    output += "</br>"
-                    output += "<a href =' #'> Delete </a>"
+                for restaurant in restaurants:
+                    output += restaurant.name
                     output += "</br></br></br>"
 
                 output += "</body></html>"
@@ -43,7 +38,7 @@ class webServerHandler(BaseHTTPRequestHandler):
 def main():
     try:
         server = HTTPServer(('', 8080), webServerHandler)
-        print 'Web server running...open localhost:8080/catalog in your browser'
+        print 'Web server running...open localhost:8080/restaurants in your browser'
         server.serve_forever()
     except KeyboardInterrupt:
         print '^C received, shutting down server'
