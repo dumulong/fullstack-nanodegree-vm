@@ -1,0 +1,33 @@
+<html>
+
+<head>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap.min.css') }}">
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+<div class="container">
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+
+        <a class="navbar-brand mr-auto" href="#">Catalog App</a>
+
+        <button class="btn btn-outline-success" type="submit">Login</button>
+
+    </nav>
+
+    <div class="container pane">
+
+        {% for category in categories %}
+        <a href = "{{url_for('showCatalog')}}"> <p>{{category.name}}</p></a>
+        {% endfor %}
+
+        <a class="btn btn-outline-success" href="{{url_for('newItem')}}" > Add Item </a>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

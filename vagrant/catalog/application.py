@@ -1,53 +1,49 @@
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-import cgi
-
-# import CRUD Operations from Lesson 1
-from database_setup import Base, Category, CategoryItem
+from flask import Flask, render_template, request, redirect, jsonify, url_for
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from database_setup import Base, Category, CategoryItem
 
-# Create session and connect to DB
+app = Flask(__name__)
+
 engine = create_engine('sqlite:///catalog.db')
 Base.metadata.bind = engine
+
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+# @app.route('/catalog.json')
+# def restaurantMenuJSON():
+#     catgories = session.query(Category).all()
+#     for category in categories:
+#         items = session.query(CatgoryItem).filter_by(category_id=category.id).all()
 
-class webServerHandler(BaseHTTPRequestHandler):
-
-    def do_GET(self):
-        try:
-            if self.path.endswith("/catalog"):
-                categories = session.query(Category).all()
-                output = ""
-                self.send_response(200)
-                self.send_header('Content-type', 'text/html')
-                self.end_headers()
-                output += "<html><body>"
-                for category in categories:
-                    output += category.name
-                    output += "</br>"
-                    # Objective 2 -- Add Edit and Delete Links
-                    output += "<a href ='#' >Edit </a> "
-                    output += "</br>"
-                    output += "<a href =' #'> Delete </a>"
-                    output += "</br></br></br>"
-
-                output += "</body></html>"
-                self.wfile.write(output)
-                return
-        except IOError:
-            self.send_error(404, 'File Not Found: %s' % self.path)
+#     return jsonify(MenuItems=[i.serialize for i in items])
 
 
-def main():
-    try:
-        server = HTTPServer(('', 8080), webServerHandler)
-        print 'Web server running...open localhost:8080/catalog in your browser'
-        server.serve_forever()
-    except KeyboardInterrupt:
-        print '^C received, shutting down server'
-        server.socket.close()
+# Show all categories and the latest items
+@app.route('/')
+@app.route('/catalog/')
+def showCatalog():
+    categories = session.query(Category).all()
+    # return "This page will show all my categories"
+    return render_template('catalog.html', categories=categories)
+
+
+@app.route('/catalog/add/', methods=['GET', 'POST'])
+def newItem():
+    if request.method == 'POST':
+        newItem = CategoryItem(
+            title=request.form['title'],
+            description=request.form['description'],
+            category_id=request.form['category_id'])
+        session.add(newItem)
+        session.commit()
+
+        return redirect(url_for('showCatalog'))
+    else:
+        categories = session.query(Category).all()
+        return render_template('newItem.html', categories=categories)
 
 if __name__ == '__main__':
-    main()
+    app.debug = True
+    app.run(host='0.0.0.0', port=5000, threaded=False)
