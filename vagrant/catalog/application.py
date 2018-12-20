@@ -25,8 +25,9 @@ session = DBSession()
 @app.route('/catalog/')
 def showCatalog():
     categories = session.query(Category).all()
+    items = session.query(CategoryItem).all()
     # return "This page will show all my categories"
-    return render_template('catalog.html', categories=categories)
+    return render_template('catalog.html', categories=categories, items=items)
 
 
 @app.route('/catalog/add/', methods=['GET', 'POST'])
