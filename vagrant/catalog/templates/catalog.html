@@ -4,9 +4,9 @@
     <div class="col-sm-6">
         <div class="card">
             <div class="card-body">
-
+                <h2><a href="{{url_for('showCatalog')}}">Categories</a></h2>
                 {% for category in categories %}
-                <a href = "{{url_for('showItems', category_id = category.id)}}"> <p>{{category.name}}</p></a>
+                <a href="{{url_for('showItems', category = category.name)}}"> <p>{{category.name}}</p></a>
                 {% endfor %}
 
             </div>
@@ -18,16 +18,29 @@
             <div class="card-body">
 
                 {% if category %}
-                <h2>Category: {{category.name}}</h2>
+
+                    <h2>Category: {{category.name}} ({{items|length}} items)</h2>
+
+                    {% for item in items %}
+                    <a href = "{{url_for('showItem', category=item.category.name, item=item.title)}}"> <p>{{item.title}}</p></a>
+                    {% endfor %}
+
+                    {% if items|length == 0 %}
+                    <div class="no-item-found">No item found for this category</div>
+                    {% endif %}
+
+                {% else %}
+
+                    <h2>Latest Items:</h2>
+
+                    {% for item in items %}
+                    <a href = "{{url_for('showItem', category=item.category.name, item=item.title)}}"> <p>{{item.title}} ({{item.category.name}})</p></a>
+                    {% endfor %}
                 {% endif %}
 
-                {% if items|length == 0 %}
-                <div class="no-item-found">No items found for this category</div>
-                {% endif %}
 
-                {% for item in items %}
-                <a href = "{{url_for('showCatalog')}}"> <p>{{item.title}} ({{item.category_id}})</p></a>
-                {% endfor %}
+
+
             </div>
         </div>
     </div>

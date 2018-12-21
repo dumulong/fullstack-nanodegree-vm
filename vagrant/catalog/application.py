@@ -25,20 +25,28 @@ session = DBSession()
 @app.route('/catalog/')
 def showCatalog():
     categories = session.query(Category).all()
-    items = session.query(CategoryItem).all()
+    items = session.query(CategoryItem).order_by(CategoryItem.id.desc()).all()
     # return "This page will show all my categories"
     page = render_template('header.html')
     page = page + render_template('catalog.html', categories=categories, items=items)
     page = page + render_template('footer.html')
     return page
 
-@app.route('/category/<int:category_id>/items')
-def showItems(category_id):
+@app.route('/catalog/<string:category>/items')
+def showItems(category):
     categories = session.query(Category).all()
-    category = session.query(Category).filter_by(id=category_id).one()
-    items = session.query(CategoryItem).filter_by(category_id=category_id).all()
+    cat = session.query(Category).filter_by(name=category).one()
+    items = session.query(CategoryItem).filter_by(category_id=cat.id).order_by(CategoryItem.title.asc()).all()
     page = render_template('header.html')
     page = page + render_template('catalog.html', categories=categories, category=category, items=items)
+    page = page + render_template('footer.html')
+    return page
+
+@app.route('/catalog/<string:category>/<string:item>')
+def showItem(category, item):
+    myItem = session.query(CategoryItem).filter_by(title=item).one()
+    page = render_template('header.html')
+    page = page + render_template('item.html', item=myItem)
     page = page + render_template('footer.html')
     return page
 
