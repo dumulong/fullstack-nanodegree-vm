@@ -24,7 +24,7 @@ session = DBSession()
 @app.route('/')
 @app.route('/catalog/')
 def showCatalog():
-    categories = session.query(Category).all()
+    categories = session.query(Category).order_by(Category.name).all()
     items = session.query(CategoryItem).order_by(CategoryItem.id.desc()).all()
     # return "This page will show all my categories"
     page = render_template('header.html')
@@ -62,9 +62,58 @@ def newItem():
 
         return redirect(url_for('showCatalog'))
     else:
-        categories = session.query(Category).all()
-        return render_template('newItem.html', categories=categories)
+        categories = session.query(Category).order_by(Category.name).all()
+        page = render_template('header.html')
+        page = page + render_template('itemAdd.html', categories=categories)
+        page = page + render_template('footer.html')
+        return page
+
+@app.route('/catalog/edit/<int:item>', methods=['GET', 'POST'])
+@app.route('/catalog/edit/<string:item>', methods=['GET', 'POST'])
+def editItem(item):
+
+    # We want to allow sending an item id or name...
+    try:
+        val = int(item)
+        myItem = session.query(CategoryItem).filter_by(id=val).one()
+    except ValueError:
+        myItem = session.query(CategoryItem).filter_by(title=item).one()
+
+    if request.method == 'POST':
+        myItem.title = request.form['title']
+        myItem.description = request.form['description']
+        myItem.category_id = request.form['category_id']
+        session.commit()
+        return redirect(url_for('showItem', category=myItem.category.name, item=myItem.title))
+    else:
+        categories = session.query(Category).order_by(Category.name).all()
+        page = render_template('header.html')
+        page = page + render_template('itemEdit.html', item=myItem, categories=categories)
+        page = page + render_template('footer.html')
+        return page
+
+@app.route('/catalog/delete/<int:item>', methods=['GET', 'POST'])
+@app.route('/catalog/delete/<string:item>', methods=['GET', 'POST'])
+def deleteItem(item):
+
+    # We want to allow sending an item id or name...
+    try:
+        val = int(item)
+        myItem = session.query(CategoryItem).filter_by(id=val).one()
+    except ValueError:
+        myItem = session.query(CategoryItem).filter_by(title=item).one()
+
+    if request.method == 'POST':
+        session.delete(myItem)
+        session.commit()
+        return redirect(url_for('showCatalog'))
+    else:
+        categories = session.query(Category).order_by(Category.name).all()
+        page = render_template('header.html')
+        page = page + render_template('itemDelete.html', item=myItem, categories=categories)
+        page = page + render_template('footer.html')
+        return page
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(host='0.0.0.0', port=5000, threaded=False)
+    app.run(host='0.0.0.0', port=8000, threaded=False)

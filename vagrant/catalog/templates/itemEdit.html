@@ -1,0 +1,48 @@
+<div class="pane row">
+
+    <div class="col-sm-12">
+
+        <div class="card">
+            <div class="card-body">
+                <h2>Edit Item</h2>
+                <form action="#" method="POST">
+
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input type="text" class="form-control" name="title" id="title" value="{{item.title}}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea rows="3" class="form-control" name="description" id="description">{{item.description}}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category_id">Category</label>
+                        <select class="form-control" name="category_id" id="category_id">
+                            {% for category in categories %}
+                                {% if item.category_id == category.id %}
+                                    <option value="{{category.id}}" selected>{{category.name}}</option>
+                                {% else %}
+                                    <option value="{{category.id}}">{{category.name}}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
+
+                    <a href="{{url_for('showItem', category=item.category.name, item=item.title)}}">
+                        <button type="button" class="btn btn-secondary">Cancel</button>
+                    </a>
+
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
