@@ -1,57 +1,37 @@
-<html>
 
-<head>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap.min.css') }}">
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
-</head>
+<div class="pane row">
 
-<body>
-<div class="container">
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-body">
 
-    <nav class="navbar navbar-dark bg-dark">
+                {% for category in categories %}
+                <a href = "{{url_for('showItems', category_id = category.id)}}"> <p>{{category.name}}</p></a>
+                {% endfor %}
 
-        <a class="navbar-brand mr-auto" href="#">Catalog App</a>
-
-        <button class="btn btn-light" type="submit">Login</button>
-
-    </nav>
-
-    <div class="pane">
-
-        <div class="row">
-
-            <div class="col-sm-6">
-                <div class="card">
-                    <div class="card-body">
-
-                        {% for category in categories %}
-                        <a href = "{{url_for('showCatalog')}}"> <p>{{category.name}}</p></a>
-                        {% endfor %}
-
-                    </div>
-                </div>
             </div>
-
-            <div class="col-sm-6">
-                <div class="card">
-                    <div class="card-body">
-                        {% for item in items %}
-                        <a href = "{{url_for('showCatalog')}}"> <p>{{item.title}} ({{item.category_id}})</p></a>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-
         </div>
-
     </div>
 
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-body">
 
-    <a class="btn btn-outline-success" href="{{url_for('newItem')}}" > Add Item </a>
+                {% if category %}
+                <h2>Category: {{category.name}}</h2>
+                {% endif %}
 
+                {% if items|length == 0 %}
+                <div class="no-item-found">No items found for this category</div>
+                {% endif %}
+
+                {% for item in items %}
+                <a href = "{{url_for('showCatalog')}}"> <p>{{item.title}} ({{item.category_id}})</p></a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 
 </div>
 
-</body>
-
-</html>
+<a class="btn btn-outline-success" href="{{url_for('newItem')}}" > Add Item </a>

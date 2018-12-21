@@ -27,8 +27,20 @@ def showCatalog():
     categories = session.query(Category).all()
     items = session.query(CategoryItem).all()
     # return "This page will show all my categories"
-    return render_template('catalog.html', categories=categories, items=items)
+    page = render_template('header.html')
+    page = page + render_template('catalog.html', categories=categories, items=items)
+    page = page + render_template('footer.html')
+    return page
 
+@app.route('/category/<int:category_id>/items')
+def showItems(category_id):
+    categories = session.query(Category).all()
+    category = session.query(Category).filter_by(id=category_id).one()
+    items = session.query(CategoryItem).filter_by(category_id=category_id).all()
+    page = render_template('header.html')
+    page = page + render_template('catalog.html', categories=categories, category=category, items=items)
+    page = page + render_template('footer.html')
+    return page
 
 @app.route('/catalog/add/', methods=['GET', 'POST'])
 def newItem():
