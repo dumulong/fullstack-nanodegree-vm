@@ -26,7 +26,7 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-@app.route('/login')
+@app.route('/catalog/login')
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase+ string.digits) for x in xrange(32))
     login_session['state'] = state
@@ -123,10 +123,11 @@ def gdisconnect():
         response = make_response(json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    print 'In gdisconnect access token is %s', access_token
+    print 'In gdisconnect access token is %s' % access_token
     print 'User name is: '
     print login_session['username']
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+    print 'The URL is: %s' % url
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print 'result is '
@@ -161,7 +162,11 @@ def showCatalog():
     categories = session.query(Category).order_by(Category.name).all()
     items = session.query(CategoryItem).order_by(CategoryItem.id.desc()).all()
     # return "This page will show all my categories"
-    page = render_template('header.html')
+    if 'username' in login_session:
+        isLoggedIn = True
+    else:
+        isLoggedIn = False
+    page = render_template('header.html', isLoggedIn=isLoggedIn)
     page = page + render_template('catalog.html', categories=categories, items=items)
     page = page + render_template('footer.html')
     return page
