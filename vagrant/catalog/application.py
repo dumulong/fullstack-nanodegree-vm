@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for
+from flask import Flask, flash, render_template, request, redirect, jsonify, url_for
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, CategoryItem
@@ -126,7 +126,7 @@ def gdisconnect():
     print 'In gdisconnect access token is %s' % access_token
     print 'User name is: '
     print login_session['username']
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
     print 'The URL is: %s' % url
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
