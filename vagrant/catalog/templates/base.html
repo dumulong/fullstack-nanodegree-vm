@@ -18,11 +18,17 @@
 <script>
     document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')
 </script>
+
+{% block htmlhead %}
+{% endblock %}
+
 </head>
 
 <body>
 
 <div class="container">
+
+    {% block header %}
     <nav class="navbar navbar-dark bg-dark">
         <a class="navbar-brand mr-auto" href="{{url_for('showCatalog')}}">Catalog App</a>
         {% if isLoggedIn %}
@@ -31,6 +37,7 @@
         <a class="btn btn-light" href="{{url_for('showLogin')}}">Login</a>
         {% endif %}
     </nav>
+    {% endblock %}
 
     {% block content %}
 

@@ -1,32 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
+{% extends "base.html" %}
 
+{% block htmlhead %}
 <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
 </script>
 <script src="//apis.google.com/js/platform.js?onload=start"> </script>
 <!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
+{% endblock %}
 
-</head>
+{% block header %}
+{% endblock %}
 
-<body>
+{% block content %}
 
-<!-- GOOGLE PLUS SIGN IN BUTTON-->
+<div class="card mt-3">
+    <div class="card-body text-center">
+      <h1 class="text-center">Please Sign in using Google+:</h1>
 
-<div id="signinButton">
-    <span class="g-signin"
-    data-scope="openid email"
-    data-clientid="1019604260903-0oqdscfa303f41uc3bfmaqtutasged96.apps.googleusercontent.com"
-    data-redirecturi="postmessage"
-    data-accesstype="offline"
-    data-cookiepolicy="single_host_origin"
-    data-callback="signInCallback"
-    data-approvalprompt="force">
-    </span>
+      <div id="signinButton">
+          <span class="g-signin"
+          data-scope="openid email"
+          data-clientid="1019604260903-0oqdscfa303f41uc3bfmaqtutasged96.apps.googleusercontent.com"
+          data-redirecturi="postmessage"
+          data-accesstype="offline"
+          data-cookiepolicy="single_host_origin"
+          data-callback="signInCallback"
+          data-approvalprompt="force">
+          </span>
+      </div>
+
+      <div id="result"></div>
+  </div>
 </div>
 
-<div id="result"></div>
 
 <script>
 
@@ -69,9 +75,4 @@ function signInCallback(authResult) {
 
 </script>
 
-
-<!--END GOOGLE PLUS SIGN IN BUTTON -->
-
-  </body>
-
-  </html>
+{% endblock %}
