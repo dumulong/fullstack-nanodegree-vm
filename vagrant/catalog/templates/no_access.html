@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+
+<div class="card mt-3">
+    <div class="card-body text-center">
+        <h1 class="text-center text-danger">{{ message|safe }}</h1>
+    </div>
+</div>
+
+<script>
+    setTimeout(function() {
+        window.location.href = "/catalog";
+    }, 2000);
+</script>
+
+{% endblock %}

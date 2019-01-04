@@ -159,29 +159,36 @@ def gdisconnect():
 @app.route('/')
 @app.route('/catalog/')
 def showCatalog():
+    isLoggedIn = 'username' in login_session
     categories = session.query(Category).order_by(Category.name).all()
     items = session.query(CategoryItem).order_by(CategoryItem.id.desc()).all()
     # return "This page will show all my categories"
-    if 'username' in login_session:
-        isLoggedIn = True
-    else:
-        isLoggedIn = False
-    return render_template('catalog.html', categories=categories, items=items)
+    return render_template('catalog.html', categories=categories, items=items, isLoggedIn=isLoggedIn)
 
 @app.route('/catalog/<string:category>/items')
 def showItems(category):
+    isLoggedIn = 'username' in login_session
     categories = session.query(Category).all()
     cat = session.query(Category).filter_by(name=category).one()
     items = session.query(CategoryItem).filter_by(category_id=cat.id).order_by(CategoryItem.title.asc()).all()
-    return render_template('catalog.html', categories=categories, category=category, items=items)
+    return render_template('catalog.html', categories=categories, category=category, items=items, isLoggedIn=isLoggedIn)
 
 @app.route('/catalog/<string:category>/<string:item>')
 def showItem(category, item):
+    isLoggedIn = 'username' in login_session
     myItem = session.query(CategoryItem).filter_by(title=item).one()
-    return render_template('item.html', item=myItem)
+    return render_template('item.html', item=myItem, isLoggedIn=isLoggedIn)
 
 @app.route('/catalog/add/', methods=['GET', 'POST'])
 def newItem():
+
+    isLoggedIn = 'username' in login_session
+
+    if not isLoggedIn:
+        msg = "Sorry, you do not have access to this page.<br>"
+        msg = msg + "You must first login."
+        return render_template('no_access.html', message=msg)
+
     if request.method == 'POST':
         newItem = CategoryItem(
             title=request.form['title'],
@@ -198,6 +205,13 @@ def newItem():
 @app.route('/catalog/edit/<int:item>', methods=['GET', 'POST'])
 @app.route('/catalog/edit/<string:item>', methods=['GET', 'POST'])
 def editItem(item):
+
+    isLoggedIn = 'username' in login_session
+
+    if not isLoggedIn:
+        msg = "Sorry, you do not have access to this page.<br>"
+        msg = msg + "You must first login."
+        return render_template('no_access.html', message=msg)
 
     # We want to allow sending an item id or name...
     try:
@@ -219,6 +233,13 @@ def editItem(item):
 @app.route('/catalog/delete/<int:item>', methods=['GET', 'POST'])
 @app.route('/catalog/delete/<string:item>', methods=['GET', 'POST'])
 def deleteItem(item):
+
+    isLoggedIn = 'username' in login_session
+
+    if not isLoggedIn:
+        msg = "Sorry, you do not have access to this page.<br>"
+        msg = msg + "You must first login."
+        return render_template('no_access.html', message=msg)
 
     # We want to allow sending an item id or name...
     try:

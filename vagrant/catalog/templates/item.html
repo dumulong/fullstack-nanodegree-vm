@@ -13,10 +13,12 @@
                     {{item.description}}
                 </div>
                 <div style="padding-top: 10px;">
-                    <a href = "{{url_for('editItem', item=item.title)}}"><span>Edit</span></a>
-                    <span>|</span>
-                    <a href = "{{url_for('deleteItem', item=item.title)}}"><span>Delete</span></a>
-                    <span>|</span>
+                    {% if isLoggedIn %}
+                        <a href = "{{url_for('editItem', item=item.title)}}"><span>Edit</span></a>
+                        <span>|</span>
+                        <a href = "{{url_for('deleteItem', item=item.title)}}"><span>Delete</span></a>
+                        <span>|</span>
+                    {% endif %}
                     <a href = "{{url_for('showCatalog')}}"><span>Back To Catalog</span></a>
                 </div>
             </div>

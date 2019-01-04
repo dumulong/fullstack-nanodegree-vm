@@ -22,7 +22,7 @@
 
                 {% if category %}
 
-                    <h2>Category: {{category.name}} ({{items|length}} items)</h2>
+                    <h2>Category: {{category}} ({{items|length}} items)</h2>
 
                     {% for item in items %}
                     <a href = "{{url_for('showItem', category=item.category.name, item=item.title)}}"> <p>{{item.title}}</p></a>
@@ -39,10 +39,8 @@
                     {% for item in items %}
                     <a href = "{{url_for('showItem', category=item.category.name, item=item.title)}}"> <p>{{item.title}} ({{item.category.name}})</p></a>
                     {% endfor %}
+
                 {% endif %}
-
-
-
 
             </div>
         </div>
