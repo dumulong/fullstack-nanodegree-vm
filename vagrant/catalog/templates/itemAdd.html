@@ -1,44 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+
 <div class="pane row">
 
-        <div class="col-sm-12">
+    <div class="col-sm-12">
 
-            <div class="card">
-                <div class="card-body">
-                    <h2>Add Item</h2>
-                    <form action="#" method="POST">
+        <div class="card">
+            <div class="card-body">
+                <h2>Add Item</h2>
+                <form action="#" method="POST">
 
-                        <div class="form-group">
-                            <label for="title">Title</label>
-                            <input type="text" class="form-control" name="title" id="title" value="">
-                        </div>
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input type="text" class="form-control" name="title" id="title" value="">
+                    </div>
 
-                        <div class="form-group">
-                            <label for="description">Description</label>
-                            <textarea rows="3" class="form-control" name="description" id="description"></textarea>
-                        </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea rows="3" class="form-control" name="description" id="description"></textarea>
+                    </div>
 
-                        <div class="form-group">
-                            <label for="category_id">Category</label>
-                            <select class="form-control" name="category_id" id="category_id">
-                                {% for category in categories %}
-                                    <option value="{{category.id}}">{{category.name}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label for="category_id">Category</label>
+                        <select class="form-control" name="category_id" id="category_id">
+                            {% for category in categories %}
+                                <option value="{{category.id}}">{{category.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                        <button type="submit" class="btn btn-primary">Add</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
 
-                        <a href="{{url_for('showCatalog')}}">
-                            <button type="button" class="btn btn-secondary">Cancel</button>
-                        </a>
+                    <a href="{{url_for('showCatalog')}}">
+                        <button type="button" class="btn btn-secondary">Cancel</button>
+                    </a>
 
 
-                    </form>
-
-                </div>
+                </form>
 
             </div>
 
         </div>
 
     </div>
+
+</div>
+
+{% endblock %}
