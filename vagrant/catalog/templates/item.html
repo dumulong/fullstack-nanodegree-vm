@@ -13,7 +13,7 @@
                     {{item.description}}
                 </div>
                 <div style="padding-top: 10px;">
-                    {% if isLoggedIn %}
+                    {% if isOwner %}
                         <a href = "{{url_for('editItem', category=category, item=item.title)}}"><span>Edit</span></a>
                         <span>|</span>
                         <a href = "{{url_for('deleteItem', category=category, item=item.title)}}"><span>Delete</span></a>

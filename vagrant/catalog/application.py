@@ -4,7 +4,7 @@ from flask import Flask, flash, render_template, \
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import exc as SQLException
-from database_setup import Base, Category, CategoryItem
+from database_setup import Base, Category, CategoryItem, User
 
 from flask import session as login_session
 import random
@@ -120,6 +120,12 @@ def gconnect():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
+    # see if user exists and if it doesn't, make a new one
+    user_id = getUserID(login_session['email'])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
+
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
@@ -130,6 +136,7 @@ def gconnect():
     output += ' border-radius: 150px; '
     output += ' -webkit-border-radius: 150px; '
     output += ' -moz-border-radius: 150px;"> '
+
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -278,17 +285,24 @@ def categoryItemsJSON(category):
 
 @app.route('/catalog/<string:category>/<string:item>')
 def showItem(category, item):
-    isLoggedIn = 'username' in login_session
+
     try:
         # First, retrieve the category
         catObj = session.query(Category).filter_by(name=category).one()
         # Then retrieve the item based on the category.id and the title
         itemObj = session.query(CategoryItem) \
             .filter_by(category_id=catObj.id, title=item).one()
+        # Is the owner the current user?
+        isLoggedIn = 'username' in login_session
+        print login_session['user_id']
+        if isLoggedIn:
+            isOwner = login_session['user_id'] == itemObj.user_id
+        else:
+            isOwner = False
         # Show the template
         return render_template(
             'item.html', category=category,
-            item=itemObj, isLoggedIn=isLoggedIn)
+            item=itemObj, isLoggedIn=isLoggedIn, isOwner=isOwner)
 
     except SQLException.NoResultFound:
         msg = "Unable to locate the item [%s]" % item
@@ -347,7 +361,8 @@ def newItem():
         newItem = CategoryItem(
             title=request.form['title'],
             description=request.form['description'],
-            category_id=request.form['category_id'])
+            category_id=request.form['category_id'],
+            user_id=login_session['user_id'])
         session.add(newItem)
         session.commit()
 
@@ -367,20 +382,25 @@ def newItem():
     '/catalog/edit/<string:category>/<string:item>', methods=['GET', 'POST'])
 def editItem(category, item):
 
-    isLoggedIn = 'username' in login_session
-
-    # The user must be Authenticated to use this function
-    if not isLoggedIn:
-        msg = "Sorry, you do not have access to this page.<br>"
-        msg = msg + "You must first login."
-        return render_template('error.html', message=msg)
-
     try:
         # First, retrieve the category
         catObj = session.query(Category).filter_by(name=category).one()
         # Then retrieve the item based on the category.id and the title
         itemObj = session.query(CategoryItem) \
             .filter_by(category_id=catObj.id, title=item).one()
+
+        isLoggedIn = 'username' in login_session
+
+        if isLoggedIn:
+            isOwner = login_session['user_id'] == itemObj.user_id
+        else:
+            isOwner = False
+
+        # The user must be Authenticated to use this function
+        if not isOwner:
+            msg = "Sorry, you do not have access to this page.<br>"
+            msg = msg + "You must be the item's owner in odre to edit it."
+            return render_template('error.html', message=msg)
 
         # If it's a POST, save the changes to the database
         if request.method == 'POST':
@@ -416,20 +436,25 @@ def editItem(category, item):
     '/catalog/delete/<string:category>/<string:item>', methods=['GET', 'POST'])
 def deleteItem(category, item):
 
-    isLoggedIn = 'username' in login_session
-
-    # The user must be Authenticated to use this function
-    if not isLoggedIn:
-        msg = "Sorry, you do not have access to this page.<br>"
-        msg = msg + "You must first login."
-        return render_template('error.html', message=msg)
-
     try:
         # First, retrieve the category
         catObj = session.query(Category).filter_by(name=category).one()
         # Then retrieve the item based on the category.id and the title
         itemObj = session.query(CategoryItem) \
             .filter_by(category_id=catObj.id, title=item).one()
+
+        isLoggedIn = 'username' in login_session
+
+        if isLoggedIn:
+            isOwner = login_session['user_id'] == itemObj.user_id
+        else:
+            isOwner = False
+
+        # The user must be Authenticated to use this function
+        if not isOwner:
+            msg = "Sorry, you do not have access to this page.<br>"
+            msg = msg + "You must be the item's owner in odre to edit it."
+            return render_template('error.html', message=msg)
 
         # If it's a POST, delete the item from the database
         if request.method == 'POST':
@@ -452,6 +477,24 @@ def deleteItem(category, item):
         msg = 'Ops, something went terribly wrong...'
         return render_template('error.html', message=msg)
 
+def getUserID(email):
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
+
+def getUserInfo(user_id):
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+def createUser(login_session):
+    newUser = User(email = login_session['email'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User) \
+        .filter_by(email = login_session['email']).one()
+    return user.id
 
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
