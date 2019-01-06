@@ -399,7 +399,7 @@ def editItem(category, item):
         # The user must be Authenticated to use this function
         if not isOwner:
             msg = "Sorry, you do not have access to this page.<br>"
-            msg = msg + "You must be the item's owner in odre to edit it."
+            msg = msg + "You must be the item's owner in order to edit it."
             return render_template('error.html', message=msg)
 
         # If it's a POST, save the changes to the database
@@ -453,7 +453,7 @@ def deleteItem(category, item):
         # The user must be Authenticated to use this function
         if not isOwner:
             msg = "Sorry, you do not have access to this page.<br>"
-            msg = msg + "You must be the item's owner in odre to edit it."
+            msg = msg + "You must be the item's owner in order to delete it."
             return render_template('error.html', message=msg)
 
         # If it's a POST, delete the item from the database
