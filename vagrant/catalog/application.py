@@ -226,10 +226,13 @@ def showItems(category):
 
     try:
         isLoggedIn = 'username' in login_session
-        categories = session.query(Category).all()
+        # First, retrieve the category
         catObj = session.query(Category).filter_by(name=category).one()
+        # Then retrieve the items based on the category.id (ordered by title)
         items = session.query(CategoryItem).filter_by(category_id=catObj.id) \
             .order_by(CategoryItem.title.asc()).all()
+        # Retrieve all the categories, we will need them for the page
+        categories = session.query(Category).all()
         return render_template(
             'catalog.html',
             categories=categories, category=catObj.name,
@@ -251,7 +254,9 @@ def showItems(category):
 def categoryItemsJSON(category):
 
     try:
+        # First, retrieve the category
         catObj = session.query(Category).filter_by(name=category).one()
+        # Then retrieve the items based on the category.id (ordered by title)
         items = session.query(CategoryItem).filter_by(category_id=catObj.id) \
             .order_by(CategoryItem.title.asc()).all()
         return jsonify(Items=[i.serialize for i in items])
@@ -275,9 +280,12 @@ def categoryItemsJSON(category):
 def showItem(category, item):
     isLoggedIn = 'username' in login_session
     try:
+        # First, retrieve the category
         catObj = session.query(Category).filter_by(name=category).one()
+        # Then retrieve the item based on the category.id and the title
         itemObj = session.query(CategoryItem) \
             .filter_by(category_id=catObj.id, title=item).one()
+        # Show the template
         return render_template(
             'item.html', category=category,
             item=itemObj, isLoggedIn=isLoggedIn)
@@ -298,7 +306,9 @@ def showItem(category, item):
 @app.route('/catalog/<string:category>/<string:item>/JSON')
 def showItemJSON(category, item):
     try:
+        # First, retrieve the category
         catObj = session.query(Category).filter_by(name=category).one()
+        # Then retrieve the item based on the category.id and the title
         itemObj = session.query(CategoryItem) \
             .filter_by(category_id=catObj.id, title=item).one()
         response = make_response(jsonify(item=itemObj.serialize), 200)
@@ -326,11 +336,13 @@ def newItem():
 
     isLoggedIn = 'username' in login_session
 
+    # The user must be Authenticated to use this function
     if not isLoggedIn:
         msg = "Sorry, you do not have access to this page.<br>"
         msg = msg + "You must first login."
         return render_template('error.html', message=msg)
 
+    # If it's a POST, add the item in the database
     if request.method == 'POST':
         newItem = CategoryItem(
             title=request.form['title'],
@@ -340,6 +352,8 @@ def newItem():
         session.commit()
 
         return redirect(url_for('showCatalog'))
+
+    # If it's not a POST, just show the form
     else:
         categories = session.query(Category).order_by(Category.name).all()
         return render_template('itemAdd.html', categories=categories)
@@ -350,22 +364,25 @@ def newItem():
 
 
 @app.route(
-    '/catalog/edit/<string:category>/<string:item>',
-    methods=['GET', 'POST'])
+    '/catalog/edit/<string:category>/<string:item>', methods=['GET', 'POST'])
 def editItem(category, item):
 
     isLoggedIn = 'username' in login_session
 
+    # The user must be Authenticated to use this function
     if not isLoggedIn:
         msg = "Sorry, you do not have access to this page.<br>"
         msg = msg + "You must first login."
         return render_template('error.html', message=msg)
 
     try:
+        # First, retrieve the category
         catObj = session.query(Category).filter_by(name=category).one()
+        # Then retrieve the item based on the category.id and the title
         itemObj = session.query(CategoryItem) \
             .filter_by(category_id=catObj.id, title=item).one()
 
+        # If it's a POST, save the changes to the database
         if request.method == 'POST':
             itemObj.title = request.form['title']
             itemObj.description = request.form['description']
@@ -374,6 +391,8 @@ def editItem(category, item):
             return redirect(url_for(
                 'showItem',
                 category=itemObj.category.name, item=itemObj.title))
+
+        # If it's not a POST, just show the edit form
         else:
             categories = session.query(Category).order_by(Category.name).all()
             return render_template(
@@ -399,20 +418,26 @@ def deleteItem(category, item):
 
     isLoggedIn = 'username' in login_session
 
+    # The user must be Authenticated to use this function
     if not isLoggedIn:
         msg = "Sorry, you do not have access to this page.<br>"
         msg = msg + "You must first login."
         return render_template('error.html', message=msg)
 
     try:
+        # First, retrieve the category
         catObj = session.query(Category).filter_by(name=category).one()
+        # Then retrieve the item based on the category.id and the title
         itemObj = session.query(CategoryItem) \
             .filter_by(category_id=catObj.id, title=item).one()
 
+        # If it's a POST, delete the item from the database
         if request.method == 'POST':
             session.delete(itemObj)
             session.commit()
             return redirect(url_for('showCatalog'))
+
+        # If it's not a POST, just show the delete confirmation form
         else:
             categories = session.query(Category).order_by(Category.name).all()
             return render_template(
