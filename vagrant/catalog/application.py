@@ -1,15 +1,14 @@
-from flask import Flask, flash, render_template, request, redirect, jsonify, url_for
+from flask import Flask, flash, render_template, \
+    request, redirect, jsonify, url_for
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import exc as SQLException
 from database_setup import Base, Category, CategoryItem
 
-#from catalogList import Item, Category, Catalog
-
 from flask import session as login_session
-import random, string
-
-app = Flask(__name__)
+import random
+import string
 
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
@@ -17,6 +16,8 @@ import httplib2
 import json
 from flask import make_response
 import requests
+
+app = Flask(__name__)
 
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
@@ -31,15 +32,22 @@ session = DBSession()
 # ======================================================
 # Enpoint for /catalog/login
 # ======================================================
+
+
 @app.route('/catalog/login')
 def showLogin():
-    state = ''.join(random.choice(string.ascii_uppercase+ string.digits) for x in xrange(32))
+
+    state = '' . join(random.choice(
+        string.ascii_uppercase + string.digits) for x in xrange(32))
+
     login_session['state'] = state
     return render_template('login.html', STATE=state)
 
 # ======================================================
 # Enpoint for /gconnect
 # ======================================================
+
+
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
@@ -92,8 +100,8 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(
+            json.dumps('Current user is already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -118,7 +126,10 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px; '
+    output += ' border-radius: 150px; '
+    output += ' -webkit-border-radius: 150px; '
+    output += ' -moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -126,12 +137,15 @@ def gconnect():
 # ======================================================
 # Enpoint for /gdisconnect
 # ======================================================
+
+
 @app.route('/gdisconnect')
 def gdisconnect():
     access_token = login_session.get('access_token')
     if access_token is None:
         print 'Access Token is None'
-        response = make_response(json.dumps('Current user not connected.'), 401)
+        response = make_response(
+            json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     print 'In gdisconnect access token is %s' % access_token
@@ -149,13 +163,17 @@ def gdisconnect():
         del login_session['username']
         del login_session['email']
         del login_session['picture']
-        return render_template('error.html', message="Successfully disconnected.")
+        return render_template(
+            'error.html', message="Successfully disconnected.")
     else:
-        return render_template('error.html', message="Failed to revoke token for given user.")
+        return render_template(
+            'error.html', message="Failed to revoke token for given user.")
 
 # ======================================================
 # Enpoint for / or /catalog
 # ======================================================
+
+
 @app.route('/')
 @app.route('/catalog/')
 def showCatalog():
@@ -165,8 +183,11 @@ def showCatalog():
         categories = session.query(Category).order_by(Category.name).all()
         # Get the latest X items:
         maxItemToShow = 5
-        items = session.query(CategoryItem).order_by(CategoryItem.id.desc()).limit(maxItemToShow).all()
-        return render_template('catalog.html', categories=categories, items=items, isLoggedIn=isLoggedIn)
+        items = session.query(CategoryItem).order_by(CategoryItem.id.desc()) \
+            .limit(maxItemToShow).all()
+        return render_template(
+            'catalog.html', categories=categories,
+            items=items, isLoggedIn=isLoggedIn)
     except:
         msg = 'Ops, something went terribly wrong...'
         return render_template('error.html', message=msg)
@@ -174,6 +195,8 @@ def showCatalog():
 # ======================================================
 # Enpoint for /catalog/{category}/JSON
 # ======================================================
+
+
 @app.route('/catalog/<string:category>/JSON')
 def categoryJSON(category):
 
@@ -196,6 +219,8 @@ def categoryJSON(category):
 # ======================================================
 # Enpoint for /catalog/{category}/items
 # ======================================================
+
+
 @app.route('/catalog/<string:category>/items')
 def showItems(category):
 
@@ -203,8 +228,13 @@ def showItems(category):
         isLoggedIn = 'username' in login_session
         categories = session.query(Category).all()
         catObj = session.query(Category).filter_by(name=category).one()
-        items = session.query(CategoryItem).filter_by(category_id=catObj.id).order_by(CategoryItem.title.asc()).all()
-        return render_template('catalog.html', categories=categories, category=catObj.name, items=items, isLoggedIn=isLoggedIn)
+        items = session.query(CategoryItem).filter_by(category_id=catObj.id) \
+            .order_by(CategoryItem.title.asc()).all()
+        return render_template(
+            'catalog.html',
+            categories=categories, category=catObj.name,
+            items=items, isLoggedIn=isLoggedIn)
+
     except SQLException.NoResultFound:
         msg = "Unable to locate items for the category:  %s" % category
         return render_template('error.html', message=msg)
@@ -215,12 +245,15 @@ def showItems(category):
 # ======================================================
 # Enpoint for /catalog/{category}/items/JSON
 # ======================================================
+
+
 @app.route('/catalog/<string:category>/items/JSON')
 def categoryItemsJSON(category):
 
     try:
         catObj = session.query(Category).filter_by(name=category).one()
-        items = session.query(CategoryItem).filter_by(category_id=catObj.id).order_by(CategoryItem.title.asc()).all()
+        items = session.query(CategoryItem).filter_by(category_id=catObj.id) \
+            .order_by(CategoryItem.title.asc()).all()
         return jsonify(Items=[i.serialize for i in items])
     except SQLException.NoResultFound:
         msg = "Unable to locate items for the category:  %s" % category
@@ -236,13 +269,19 @@ def categoryItemsJSON(category):
 # ======================================================
 # Enpoint for /catalog/{category}/{item}
 # ======================================================
+
+
 @app.route('/catalog/<string:category>/<string:item>')
 def showItem(category, item):
     isLoggedIn = 'username' in login_session
     try:
         catObj = session.query(Category).filter_by(name=category).one()
-        itemObj = session.query(CategoryItem).filter_by(category_id=catObj.id, title=item).one()
-        return render_template('item.html', category=category, item=itemObj, isLoggedIn=isLoggedIn)
+        itemObj = session.query(CategoryItem) \
+            .filter_by(category_id=catObj.id, title=item).one()
+        return render_template(
+            'item.html', category=category,
+            item=itemObj, isLoggedIn=isLoggedIn)
+
     except SQLException.NoResultFound:
         msg = "Unable to locate the item [%s]" % item
         msg = msg + " in the category [%s]." % category
@@ -254,11 +293,14 @@ def showItem(category, item):
 # ======================================================
 # Enpoint for /catalog/{category}/{item}/JSON
 # ======================================================
+
+
 @app.route('/catalog/<string:category>/<string:item>/JSON')
 def showItemJSON(category, item):
     try:
         catObj = session.query(Category).filter_by(name=category).one()
-        itemObj = session.query(CategoryItem).filter_by(category_id=catObj.id, title=item).one()
+        itemObj = session.query(CategoryItem) \
+            .filter_by(category_id=catObj.id, title=item).one()
         response = make_response(jsonify(item=itemObj.serialize), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -277,6 +319,8 @@ def showItemJSON(category, item):
 # ======================================================
 # Enpoint for /catalog/add
 # ======================================================
+
+
 @app.route('/catalog/add', methods=['GET', 'POST'])
 def newItem():
 
@@ -303,7 +347,11 @@ def newItem():
 # ======================================================
 # Enpoint for /catalog/edit/{category}/{item}
 # ======================================================
-@app.route('/catalog/edit/<string:category>/<string:item>', methods=['GET', 'POST'])
+
+
+@app.route(
+    '/catalog/edit/<string:category>/<string:item>',
+    methods=['GET', 'POST'])
 def editItem(category, item):
 
     isLoggedIn = 'username' in login_session
@@ -315,17 +363,22 @@ def editItem(category, item):
 
     try:
         catObj = session.query(Category).filter_by(name=category).one()
-        itemObj = session.query(CategoryItem).filter_by(category_id=catObj.id, title=item).one()
+        itemObj = session.query(CategoryItem) \
+            .filter_by(category_id=catObj.id, title=item).one()
 
         if request.method == 'POST':
             itemObj.title = request.form['title']
             itemObj.description = request.form['description']
             itemObj.category_id = request.form['category_id']
             session.commit()
-            return redirect(url_for('showItem', category=itemObj.category.name, item=itemObj.title))
+            return redirect(url_for(
+                'showItem',
+                category=itemObj.category.name, item=itemObj.title))
         else:
             categories = session.query(Category).order_by(Category.name).all()
-            return render_template('itemEdit.html', item=itemObj, categories=categories)
+            return render_template(
+                'itemEdit.html', item=itemObj, categories=categories)
+
     except SQLException.NoResultFound:
         msg = "Unable to locate the item [%s]" % item
         msg = msg + " in the category [%s]." % category
@@ -338,7 +391,10 @@ def editItem(category, item):
 # ======================================================
 # Enpoint for /catalog/delete/{category}/{item}
 # ======================================================
-@app.route('/catalog/delete/<string:category>/<string:item>', methods=['GET', 'POST'])
+
+
+@app.route(
+    '/catalog/delete/<string:category>/<string:item>', methods=['GET', 'POST'])
 def deleteItem(category, item):
 
     isLoggedIn = 'username' in login_session
@@ -348,10 +404,10 @@ def deleteItem(category, item):
         msg = msg + "You must first login."
         return render_template('error.html', message=msg)
 
-
     try:
         catObj = session.query(Category).filter_by(name=category).one()
-        itemObj = session.query(CategoryItem).filter_by(category_id=catObj.id, title=item).one()
+        itemObj = session.query(CategoryItem) \
+            .filter_by(category_id=catObj.id, title=item).one()
 
         if request.method == 'POST':
             session.delete(itemObj)
@@ -359,16 +415,17 @@ def deleteItem(category, item):
             return redirect(url_for('showCatalog'))
         else:
             categories = session.query(Category).order_by(Category.name).all()
-            return render_template('itemDelete.html', item=itemObj, category=category)
+            return render_template(
+                'itemDelete.html', item=itemObj, category=category)
 
     except SQLException.NoResultFound:
         msg = "Unable to locate the item [%s]" % item
         msg = msg + " in the category [%s]." % category
         return render_template('error.html', message=msg)
 
-    # except:
-    #     msg = 'Ops, something went terribly wrong...'
-    #     return render_template('error.html', message=msg)
+    except:
+        msg = 'Ops, something went terribly wrong...'
+        return render_template('error.html', message=msg)
 
 
 if __name__ == '__main__':
