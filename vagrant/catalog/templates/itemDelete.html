@@ -17,25 +17,17 @@
 
                     <div class="form-group">
                         <label for="title">Title</label>
-                        <input type="text" class="form-control" name="title" id="title" value="{{item.title}}">
+                        <input type="text" class="form-control" name="title" id="title" value="{{item.title}}" readonly>
                     </div>
 
                     <div class="form-group">
                         <label for="description">Description</label>
-                        <textarea rows="3" class="form-control" name="description" id="description">{{item.description}}</textarea>
+                        <textarea rows="3" class="form-control" name="description" id="description" readonly>{{item.description}}</textarea>
                     </div>
 
                     <div class="form-group">
                         <label for="category_id">Category</label>
-                        <select class="form-control" name="category_id" id="category_id">
-                            {% for category in categories %}
-                                {% if item.category_id == category.id %}
-                                    <option value="{{category.id}}" selected>{{category.name}}</option>
-                                {% else %}
-                                    <option value="{{category.id}}">{{category.name}}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
+                        <input type="text" class="form-control" name="title" id="title" value="{{category}}" readonly>
                     </div>
 
                     <button type="submit" class="btn btn-primary">Delete</button>

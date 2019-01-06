@@ -15,6 +15,13 @@ class Category(Base):
     id = Column(Integer, primary_key = True)
     name = Column(String(80), nullable = False)
 
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
+
 class CategoryItem(Base):
     __tablename__ = 'category_item'
     id = Column(Integer, primary_key = True)
@@ -24,6 +31,14 @@ class CategoryItem(Base):
 
     category = relationship(Category)
 
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'category_id': self.category_id
+        }
 
 #######insert at end of File ##############
 

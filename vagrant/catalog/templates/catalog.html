@@ -25,11 +25,11 @@
                     <h2>Category: {{category}} ({{items|length}} items)</h2>
 
                     {% for item in items %}
-                    <a href = "{{url_for('showItem', category=item.category.name, item=item.title)}}"> <p>{{item.title}}</p></a>
+                        <a href = "{{url_for('showItem', category=item.category.name, item=item.title)}}"> <p>{{item.title}}</p></a>
                     {% endfor %}
 
                     {% if items|length == 0 %}
-                    <div class="no-item-found">No item found for this category</div>
+                        <div class="no-item-found">No item found for this category</div>
                     {% endif %}
 
                 {% else %}
@@ -37,7 +37,7 @@
                     <h2>Latest Items:</h2>
 
                     {% for item in items %}
-                    <a href = "{{url_for('showItem', category=item.category.name, item=item.title)}}"> <p>{{item.title}} ({{item.category.name}})</p></a>
+                        <a href = "{{url_for('showItem', category=item.category.name, item=item.title)}}"> <p>{{item.title}} ({{item.category.name}})</p></a>
                     {% endfor %}
 
                 {% endif %}
@@ -48,6 +48,8 @@
 
 </div>
 
-<a class="btn btn-outline-success" href="{{url_for('newItem')}}" > Add Item </a>
+{% if isLoggedIn %}
+    <a class="btn btn-outline-success" href="{{url_for('newItem')}}" > Add Item </a>
+{% endif %}
 
 {% endblock %}

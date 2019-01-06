@@ -14,9 +14,9 @@
                 </div>
                 <div style="padding-top: 10px;">
                     {% if isLoggedIn %}
-                        <a href = "{{url_for('editItem', item=item.title)}}"><span>Edit</span></a>
+                        <a href = "{{url_for('editItem', category=category, item=item.title)}}"><span>Edit</span></a>
                         <span>|</span>
-                        <a href = "{{url_for('deleteItem', item=item.title)}}"><span>Delete</span></a>
+                        <a href = "{{url_for('deleteItem', category=category, item=item.title)}}"><span>Delete</span></a>
                         <span>|</span>
                     {% endif %}
                     <a href = "{{url_for('showCatalog')}}"><span>Back To Catalog</span></a>
