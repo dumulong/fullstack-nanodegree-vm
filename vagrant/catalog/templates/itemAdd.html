@@ -13,7 +13,7 @@
 
                     <div class="form-group">
                         <label for="title">Title</label>
-                        <input type="text" class="form-control" name="title" id="title" value="">
+                        <input type="text" class="form-control" name="title" id="title" value="" required>
                     </div>
 
                     <div class="form-group">
@@ -23,7 +23,7 @@
 
                     <div class="form-group">
                         <label for="category_id">Category</label>
-                        <select class="form-control" name="category_id" id="category_id">
+                        <select class="form-control" name="category_id" id="category_id" required>
                             {% for category in categories %}
                                 <option value="{{category.id}}">{{category.name}}</option>
                             {% endfor %}

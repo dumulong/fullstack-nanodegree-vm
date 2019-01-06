@@ -10,6 +10,11 @@ from sqlalchemy import create_engine
 
 Base = declarative_base()
 
+class User(Base):
+    __tablename__ = 'user'
+    id = Column(Integer, primary_key = True)
+    email = Column(String(80), unique = True, nullable = False)
+
 class Category(Base):
     __tablename__ = 'category'
     id = Column(Integer, primary_key = True)
@@ -27,8 +32,11 @@ class CategoryItem(Base):
     id = Column(Integer, primary_key = True)
     title = Column(String(80), nullable = False)
     description = Column(String(250))
-    category_id = Column(Integer, ForeignKey('category.id'))
 
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
+
+    category_id = Column(Integer, ForeignKey('category.id'))
     category = relationship(Category)
 
     @property
