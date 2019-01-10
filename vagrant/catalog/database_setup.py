@@ -50,6 +50,14 @@ class CategoryItem(Base):
 
 #######insert at end of File ##############
 
-engine = create_engine('sqlite:///catalog.db')
+#engine = create_engine('sqlite:///catalog.db')
+
+# NOTE: to create the database:
+# sudo -u postgres psql
+# postgres=# create database postgres_catalog;
+# postgres=# create user udacity with encrypted password 'n0pedy';
+# postgres=# grant all privileges on database postgres_catalog to udacity;
+engine = create_engine('postgresql://udacity:n0pedy@localhost/postgres_catalog')
 
 Base.metadata.create_all(engine)
+

@@ -23,7 +23,7 @@ CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Restaurant Menu Application"
 
-engine = create_engine('sqlite:///catalog.db')
+engine = create_engine('postgresql://udacity:n0pedy@localhost/postgres_catalog')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
@@ -294,7 +294,6 @@ def showItem(category, item):
             .filter_by(category_id=catObj.id, title=item).one()
         # Is the owner the current user?
         isLoggedIn = 'username' in login_session
-        print login_session['user_id']
         if isLoggedIn:
             isOwner = login_session['user_id'] == itemObj.user_id
         else:
